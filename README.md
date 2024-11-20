@@ -47,7 +47,7 @@ Este projeto consiste em dois sistemas principais, desenvolvidos em **Go**:
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/paulonunes/goexpert-cotacao-usd-brl.git
+   git clone https://github.com/paulnune/goexpert-cotacao-usd-brl.git
    cd goexpert-cotacao-usd-brl
 
 2. Inicialize o módulo do Go:
