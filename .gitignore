@@ -6,3 +6,4 @@ cotacao.txt
 
 # Não ignorar go.mod (necessário para dependências do Go)
 !go.mod
+!go.sum

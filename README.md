@@ -1,3 +1,4 @@
+
 # 💰 GoExpert - Cotação USD/BRL 📈
 
 Bem-vindo ao repositório do desafio da **Pós GoExpert 2024**! Este projeto foi desenvolvido por **Paulo Nunes** para demonstrar conhecimentos em **Go**, abrangendo conceitos como servidores HTTP, contextos, banco de dados SQLite e manipulação de arquivos.
@@ -49,53 +50,61 @@ Este projeto consiste em dois sistemas principais, desenvolvidos em **Go**:
    ```bash
    git clone https://github.com/paulnune/goexpert-cotacao-usd-brl.git
    cd goexpert-cotacao-usd-brl
+   ```
 
 2. Inicialize o módulo do Go:
    ```bash
-    go mod init goexpert-cotacao-usd-brl
+   go mod init goexpert-cotacao-usd-brl
+   ```
 
 3. Instale a dependência do SQLite:
    ```bash
-    go get github.com/mattn/go-sqlite3
+   go get github.com/mattn/go-sqlite3
+   ```
 
 4. Organize as dependências:
-    ```bash
-    go mod tidy
+   ```bash
+   go mod tidy
+   ```
 
 5. Inicie o servidor:
-    ```bash
-    go run server.go
-
-O servidor estará disponível em http://localhost:8080/cotacao.
+   ```bash
+   go run server.go
+   ```
+   O servidor estará disponível em http://localhost:8080/cotacao.
 
 6. Em outro terminal, execute o cliente:
-
-    ```bash
-    go run client.go
+   ```bash
+   go run client.go
+   ```
 
 7. Verifique os resultados:
-
-- O arquivo cotacao.txt conterá a cotação no formato:
-
-    ```css
-    Dólar: {valor}
-
-- O banco de dados SQLite (cotacoes.db) terá o histórico de cotações salvas.
+   - O arquivo `cotacao.txt` conterá a cotação no formato:
+     ```
+     Dólar: {valor}
+     ```
+   - O banco de dados SQLite (`cotacoes.db`) terá o histórico de cotações salvas.
 
 ---
 
 ## 📂 Estrutura do Projeto
 
-    ├── client.go       # Sistema cliente que consome o servidor
-    ├── server.go       # Servidor HTTP que consome a API e persiste no banco
-    ├── cotacoes.db     # Banco de dados SQLite (gerado automaticamente)
-    ├── cotacao.txt     # Arquivo contendo a cotação atual (gerado pelo client)
-    └── go.mod          # Arquivo de dependências do Go
+```
+├── client.go       # Sistema cliente que consome o servidor
+├── server.go       # Servidor HTTP que consome a API e persiste no banco
+├── cotacoes.db     # Banco de dados SQLite (gerado automaticamente)
+├── cotacao.txt     # Arquivo contendo a cotação atual (gerado pelo client)
+└── go.mod          # Arquivo de dependências do Go
+```
+
+---
 
 ## 📖 Referências
 
 - [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas)  
 - [Documentação oficial do Go](https://golang.org/doc/)
+
+---
 
 ## 👨‍💻 Autor
 
@@ -105,8 +114,8 @@ O servidor estará disponível em http://localhost:8080/cotacao.
 - ✉️ Email: [paulo.nunes@live.de](mailto:paulo.nunes@live.de)  
 - 🚀 Aluno da Pós **GoExpert 2024** pela [FullCycle](https://fullcycle.com.br)
 
+---
+
 ## 🎉 Agradecimentos
 
 Este repositório foi desenvolvido com muita dedicação para a **Pós GoExpert 2024**. Agradeço à equipe da **FullCycle** por proporcionar uma experiência incrível de aprendizado! 🚀
-
-

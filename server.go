@@ -15,8 +15,8 @@ const (
 	apiURL         = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
 	databaseFile   = "cotacoes.db"
 	serverPort     = ":8080"
-	cotacaoTimeout = 500 * time.Millisecond // Aumentado o timeout para 500ms
-	dbTimeout      = 50 * time.Millisecond  // Ajustado para um valor mais realista
+	cotacaoTimeout = 2 * time.Second       // Aumentado o timeout para 2s
+	dbTimeout      = 50 * time.Millisecond // Ajustado para um valor mais realista
 )
 
 type CotacaoAPIResponse struct {
