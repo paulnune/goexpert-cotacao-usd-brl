@@ -5,85 +5,96 @@ Bem-vindo ao repositório do desafio da **Pós GoExpert 2024**! Este projeto foi
 
 ---
 
-## 📋 Descrição do Projeto
+## 📋 Desafio Proposto
 
-Este projeto consiste em dois sistemas principais, desenvolvidos em **Go**:
+1. O sistema consiste em dois arquivos principais:
+   - **`client.go`**: Deve realizar uma requisição HTTP ao servidor (`server.go`) solicitando a cotação do dólar.
+   - **`server.go`**: Deve consumir a API pública [AwesomeAPI](https://economia.awesomeapi.com.br/json/last/USD-BRL) para obter a cotação do dólar, retornar o valor ao cliente e registrar a cotação no banco de dados SQLite.
 
-1. **`server.go`**: Um servidor HTTP que consome a API pública de câmbio [AwesomeAPI](https://economia.awesomeapi.com.br/json/last/USD-BRL), retorna a cotação atual do dólar para o cliente e salva os dados em um banco de dados SQLite.
+2. Requisitos de **Timeout**:
+   - O **server.go** deve usar o pacote `context` para:
+     - Limitar o tempo para chamar a API da AwesomeAPI a **200ms**.
+     - Limitar o tempo para registrar a cotação no banco a **10ms**.
+   - O **client.go** deve ter um timeout máximo de **300ms** para receber a resposta do servidor.
 
-2. **`client.go`**: Um cliente HTTP que realiza uma requisição ao servidor, recebe a cotação do dólar e salva o valor em um arquivo chamado `cotacao.txt`.
-
----
-
-## 🚀 Funcionalidades
-
-- **Server**:
-  - Requisição à API pública de câmbio com timeout.
-  - Persistência da cotação no banco de dados SQLite com controle de timeout.
-  - Resposta em formato JSON no endpoint `/cotacao`.
-
-- **Client**:
-  - Requisição ao servidor com controle de timeout.
-  - Salvamento da cotação recebida no arquivo `cotacao.txt`.
+3. Persistência:
+   - O servidor deve registrar a cotação no banco de dados SQLite.
+   - O cliente deve salvar o valor da cotação em um arquivo `cotacao.txt` no formato:
+     ```
+     Dólar: {valor}
+     ```
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🚀 Implementação e Justificativas
 
-- **Linguagem:** Go
-- **Banco de Dados:** SQLite
-- **Bibliotecas:** 
-  - `github.com/mattn/go-sqlite3`
-  - Pacotes nativos como `net/http`, `context`, `encoding/json`, `io/ioutil`, entre outros.
+Durante a execução do desafio, foi identificado que os **timeouts especificados no enunciado não eram viáveis** para execução no ambiente local. Problemas encontrados:
 
+1. **Latência Variável da API AwesomeAPI**:
+   - Os tempos de resposta medidos com `curl` mostraram que a API frequentemente ultrapassa os **200ms**:
+     ```
+     Tempo total: 0.564606s
+     Tempo total: 0.145143s
+     Tempo total: 0.718081s
+     Tempo total: 0.625480s
+     ```
+   - Isso torna o timeout de **200ms** insuficiente para a maioria das requisições.
+
+2. **Persistência no Banco de Dados SQLite**:
+   - Com um timeout de **10ms**, o SQLite não conseguia registrar a cotação devido a operações de I/O e concorrência no sistema.
+   - Um timeout mais realista de **100ms** foi configurado.
+
+3. **Timeout no Cliente**:
+   - Com o servidor ajustado para um timeout de **2 segundos** para a API, o cliente foi configurado com um timeout de **3 segundos**, garantindo tempo suficiente para processar a resposta.
+
+---
+
+## 🛠️ Ajustes Realizados
+
+1. **Server (server.go)**:
+   - Timeout para a API ajustado de **200ms** para **2 segundos**:
+     ```go
+     const cotacaoTimeout = 2 * time.Second
+     ```
+   - Timeout para o banco ajustado de **10ms** para **100ms**:
+     ```go
+     const dbTimeout = 100 * time.Millisecond
+     ```
+
+2. **Client (client.go)**:
+   - Timeout ajustado de **300ms** para **3 segundos**:
+     ```go
+     ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+     ```
 ---
 
 ## ⚙️ Como Executar o Projeto
 
-### Pré-requisitos
-- [Go instalado](https://golang.org/dl/) (versão 1.20 ou superior)
-- Conexão com a internet para acessar a [API AwesomeAPI](https://economia.awesomeapi.com.br/json/last/USD-BRL)
-
-### Passo a Passo
-
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/paulnune/goexpert-cotacao-usd-brl.git
-   cd goexpert-cotacao-usd-brl
-   ```
-
-2. Inicialize o módulo do Go:
-   ```bash
-   go mod init goexpert-cotacao-usd-brl
-   ```
-
-3. Instale a dependência do SQLite:
-   ```bash
-   go get github.com/mattn/go-sqlite3
-   ```
-
-4. Organize as dependências:
-   ```bash
-   go mod tidy
-   ```
-
-5. Inicie o servidor:
+### Método 1: Usando Comandos Individuais
+1. **Iniciar o servidor**:
    ```bash
    go run server.go
    ```
-   O servidor estará disponível em http://localhost:8080/cotacao.
 
-6. Em outro terminal, execute o cliente:
+2. **Executar o cliente em outro terminal**:
    ```bash
    go run client.go
    ```
 
-7. Verifique os resultados:
-   - O arquivo `cotacao.txt` conterá a cotação no formato:
-     ```
-     Dólar: {valor}
-     ```
-   - O banco de dados SQLite (`cotacoes.db`) terá o histórico de cotações salvas.
+---
+
+### Método 2: Usando o Script `run.sh`
+Se preferir, utilize o script que automatiza os passos acima. Ele:
+- Finaliza processos que estejam usando a porta 8080.
+- Inicia o servidor em segundo plano.
+- Executa o cliente.
+- Finaliza o servidor após a execução do cliente.
+
+Para executar o script:
+```bash
+chmod +x run.sh
+sh run.sh
+```
 
 ---
 
@@ -94,15 +105,9 @@ Este projeto consiste em dois sistemas principais, desenvolvidos em **Go**:
 ├── server.go       # Servidor HTTP que consome a API e persiste no banco
 ├── cotacoes.db     # Banco de dados SQLite (gerado automaticamente)
 ├── cotacao.txt     # Arquivo contendo a cotação atual (gerado pelo client)
+├── run.sh          # Script para automatizar execução do servidor e cliente
 └── go.mod          # Arquivo de dependências do Go
 ```
-
----
-
-## 📖 Referências
-
-- [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas)  
-- [Documentação oficial do Go](https://golang.org/doc/)
 
 ---
 

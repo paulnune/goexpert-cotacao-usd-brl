@@ -17,8 +17,8 @@ type Cotacao struct {
 }
 
 func main() {
-	// Timeout de 1 segundo para a requisição HTTP
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	// Timeout configurado para 3 segundos, maior que o timeout do servidor
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	log.Println("Iniciando requisição ao servidor...")

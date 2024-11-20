@@ -15,9 +15,17 @@ const (
 	apiURL         = "https://economia.awesomeapi.com.br/json/last/USD-BRL"
 	databaseFile   = "cotacoes.db"
 	serverPort     = ":8080"
-	cotacaoTimeout = 2 * time.Second       // Aumentado o timeout para 2s
-	dbTimeout      = 50 * time.Millisecond // Ajustado para um valor mais realista
+	cotacaoTimeout = 2 * time.Second        // Timeout para a chamada à API
+	dbTimeout      = 100 * time.Millisecond // Timeout para persistência no banco
 )
+
+// Reutilizar conexões HTTP com Keep-Alive
+var httpClient = &http.Client{
+	Transport: &http.Transport{
+		DisableKeepAlives: false,
+	},
+	Timeout: cotacaoTimeout,
+}
 
 type CotacaoAPIResponse struct {
 	USDBRL struct {
@@ -78,27 +86,33 @@ func main() {
 
 // Função para obter a cotação da API externa
 func obterCotacao(ctx context.Context) (Cotacao, error) {
+	log.Println("Iniciando chamada para a API externa...")
 	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
 	if err != nil {
+		log.Printf("Erro ao criar requisição: %v", err)
 		return Cotacao{}, err
 	}
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
+		log.Printf("Erro ao realizar requisição: %v", err)
 		return Cotacao{}, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		log.Printf("Resposta inválida da API: %d", resp.StatusCode)
 		return Cotacao{}, err
 	}
 
+	log.Println("Resposta da API recebida com sucesso...")
 	var apiResponse CotacaoAPIResponse
 	if err := json.NewDecoder(resp.Body).Decode(&apiResponse); err != nil {
+		log.Printf("Erro ao decodificar resposta: %v", err)
 		return Cotacao{}, err
 	}
 
+	log.Println("Cotação obtida com sucesso:", apiResponse.USDBRL.Bid)
 	return Cotacao{Bid: apiResponse.USDBRL.Bid}, nil
 }
 
