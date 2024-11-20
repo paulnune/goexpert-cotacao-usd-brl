@@ -1,0 +1,8 @@
+# Ignorar banco de dados SQLite
+cotacoes.db
+
+# Ignorar o arquivo de cotação gerado pelo client
+cotacao.txt
+
+# Não ignorar go.mod (necessário para dependências do Go)
+!go.mod
